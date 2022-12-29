@@ -56,7 +56,7 @@
         method: POST
         body_format: json
         body:
-          name: network-config-management-demo
+          name: acls-config
           auto_init: false
           private: false
         force_basic_auth: true
@@ -66,7 +66,7 @@
 
     - name: Create repo webhook
       ansible.builtin.uri:
-        url: "http://gitea:3000/api/v1/repos/{{ student_user }}/network-config-management-demo/hooks"
+        url: "http://gitea:3000/api/v1/repos/{{ student_user }}/acls-config/hooks"
         method: POST
         body_format: json
         body:
@@ -84,12 +84,12 @@
 
     - name: Remove repo dir if it exists
       ansible.builtin.file:
-        path: "/root/network-config-management-demo"
+        path: "/root/acls-config"
         state: absent
 
     - name: Create repo dir
       ansible.builtin.file:
-        path: "/root/network-config-management-demo"
+        path: "/root/acls-config"
         state: directory
         mode: 0755
 
@@ -104,8 +104,8 @@
     - name: Initialise track repo
       ansible.builtin.command:
         cmd: /usr/bin/git init
-        chdir: "/root/network-config-management-demo"
-        creates: "/network-config-management-demo/.git" 
+        chdir: "/root/acls-config"
+        creates: "/acls-config/.git" 
 
     - name: Configure git to store credentials
       community.general.git_config:
@@ -117,7 +117,7 @@
       community.general.git_config:
         name: safe.directory
         scope: global
-        value: "/root/network-config-management-demo"
+        value: "/root/acls-config"
 
     - name: Store repo credentials in git-creds file
       ansible.builtin.copy:
@@ -140,18 +140,18 @@
     - name: Extract initial repo files
       ansible.builtin.unarchive:
         src: /tmp/setup-scripts/devops-controller/files/acls-config.tar.gz
-        dest: "/root/network-config-management-demo"
-        creates: /root/network-config-management-demo/acl
+        dest: "/root/acls-config"
+        creates: /root/acls-config/acl
         remote_src: true
 
     - name: Add remote origin to repo
       ansible.builtin.command:
         cmd: "{{ item }}"
-        chdir: "/root/network-config-management-demo"   
+        chdir: "/root/acls-config"   
       register: __output
       changed_when: __output.rc == 0
       loop:
-        - "git remote add origin http://gitea:3000/{{ student_user }}/network-config-management-demo.git"
+        - "git remote add origin http://gitea:3000/{{ student_user }}/acls-config.git"
         - "git checkout -b main"
         - "git add ."
         - "git commit -m'Initial commit'"
@@ -317,7 +317,7 @@
   # Setup student git repo
     - name: Remove repo dir if it exists
       ansible.builtin.file:
-        path: "/home/{{ ansible_user }}/network-config-management-demo"
+        path: "/home/{{ ansible_user }}/acls-config"
         state: absent
       tags:
         - controller-config
@@ -346,7 +346,7 @@
       community.general.git_config:
         name: safe.directory
         scope: global
-        value: "/home/{{ ansible_user }}/network-config-management-demo"
+        value: "/home/{{ ansible_user }}/acls-config"
       become: true
       become_user: "{{ ansible_user }}"
       tags:
@@ -385,7 +385,7 @@
     - name: Pull repo from SCM
       ansible.builtin.git:
         repo: "{{ git_repo }}"
-        dest: "/home/{{ ansible_user }}/network-config-management-demo"
+        dest: "/home/{{ ansible_user }}/acls-config"
       become: true
       become_user: "{{ ansible_user }}"
       tags:
@@ -414,7 +414,7 @@
 
     - name: Install Python packages in virtualenv
       ansible.builtin.pip:
-        requirements: "/home/rhel/network-config-management-demo/playbooks/files/requirements_prod.txt"
+        requirements: "/home/rhel/acls-config/playbooks/files/requirements_prod.txt"
         virtualenv: "{{ acme_venv }}"
       become: true
       become_user: "{{ ansible_user }}"
@@ -533,7 +533,7 @@
       awx.awx.project:
         name: "{{ lab_project_name }}"
         scm_type: git
-        scm_url: "http://gitea:3000/{{ student_user }}/network-config-management-demo.git"
+        scm_url: "http://gitea:3000/{{ student_user }}/acls-config.git"
         organization: "{{ lab_organization }}"
         scm_update_on_launch: false
         scm_update_cache_timeout: 60
@@ -780,7 +780,7 @@
     - name: update-app - home.html edits
       ansible.builtin.lineinfile:
         state: present
-        path: "/home/{{ ansible_user }}/network-config-management-demo/app/lets_quiz/templates/quiz/home.html"
+        path: "/home/{{ ansible_user }}/acls-config/app/lets_quiz/templates/quiz/home.html"
         insertafter: '        <!-- FIX ME -->'
         search_string: '<p class="display-4 d-none d-sm-block">Test your skills and become a master.</p>'
         line: '        <p class="display-4 d-none d-sm-block">The latest and greatest version of the app deployed successfully.</p>'
@@ -824,7 +824,7 @@
     - name: update-app-solve add date/time line
       ansible.builtin.lineinfile:
         state: present
-        path: "/home/{{ ansible_user }}/network-config-management-demo/app/lets_quiz/manage.py"
+        path: "/home/{{ ansible_user }}/acls-config/app/lets_quiz/manage.py"
         search_string: '# solve-script-run '
         line: '# solve-script-run {{ ansible_date_time.iso8601 }}'
       check_mode: "{{ home_page_check_mode | default( false )}}"
@@ -836,7 +836,7 @@
     - name: update-app solve push code to repo
       ansible.builtin.command:
         cmd: "{{ item }}"
-        chdir: "/home/{{ ansible_user }}/network-config-management-demo"
+        chdir: "/home/{{ ansible_user }}/acls-config"
       become: true
       become_user: "{{ ansible_user }}"
       loop:
