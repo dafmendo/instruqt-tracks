@@ -780,7 +780,7 @@
     - name: update-app - home.html edits
       ansible.builtin.lineinfile:
         state: present
-        path: "/home/{{ ansible_user }}/acls-config/app/lets_quiz/templates/quiz/home.html"
+        path: "/home/{{ ansible_user }}/acme_corp/app/lets_quiz/templates/quiz/home.html"
         insertafter: '        <!-- FIX ME -->'
         search_string: '<p class="display-4 d-none d-sm-block">Test your skills and become a master.</p>'
         line: '        <p class="display-4 d-none d-sm-block">The latest and greatest version of the app deployed successfully.</p>'
@@ -824,7 +824,7 @@
     - name: update-app-solve add date/time line
       ansible.builtin.lineinfile:
         state: present
-        path: "/home/{{ ansible_user }}/acls-config/app/lets_quiz/manage.py"
+        path: "/home/{{ ansible_user }}/acme_corp/app/lets_quiz/manage.py"
         search_string: '# solve-script-run '
         line: '# solve-script-run {{ ansible_date_time.iso8601 }}'
       check_mode: "{{ home_page_check_mode | default( false )}}"
@@ -836,7 +836,7 @@
     - name: update-app solve push code to repo
       ansible.builtin.command:
         cmd: "{{ item }}"
-        chdir: "/home/{{ ansible_user }}/acls-config"
+        chdir: "/home/{{ ansible_user }}/acme_corp"
       become: true
       become_user: "{{ ansible_user }}"
       loop:
