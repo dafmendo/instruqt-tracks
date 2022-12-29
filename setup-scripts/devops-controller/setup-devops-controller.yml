@@ -139,7 +139,7 @@
 
     - name: Extract initial repo files
       ansible.builtin.unarchive:
-        src: /tmp/setup-scripts/devops-controller/files/network-config-management-demo.tar.gz
+        src: /tmp/setup-scripts/devops-controller/files/acme_repo.tar.gz
         dest: "/root/network-config-management-demo"
         creates: /root/network-config-management-demo/acl
         remote_src: true
